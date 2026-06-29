@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { sendMail, appUrl } from "@/lib/mailer";
+import { sendMailFor, appUrl } from "@/lib/mailer";
 
 type Ctx = {
   contactId?: string;
@@ -88,7 +88,7 @@ async function performAction(
     const msg = await prisma.emailMessage.create({
       data: { ownerId: p.ownerId, automationId: p.automationId, contactId: p.contactId, to: p.recipientEmail, subject, body, status: "queued", source: "automation" },
     });
-    const res = await sendMail({ to: p.recipientEmail, subject, html: renderEmailHtml(body, p.recipientName, msg.trackToken) });
+    const res = await sendMailFor(p.ownerId, { to: p.recipientEmail, subject, html: renderEmailHtml(body, p.recipientName, msg.trackToken) });
     await prisma.emailMessage.update({
       where: { id: msg.id },
       data: { status: res.ok ? "sent" : res.skipped ? "skipped" : "failed", error: res.error ?? null },

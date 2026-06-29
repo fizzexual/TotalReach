@@ -15,6 +15,7 @@ import {
   Users,
   CircleDollarSign,
   LayoutGrid,
+  Plug,
   ChevronDown,
   ChevronsUpDown,
   PanelLeft,
@@ -39,6 +40,7 @@ const TOP: NavItem[] = [
   { href: "/notes", label: "Notes", icon: StickyNote },
   { href: "/dashboard", label: "Reports", icon: BarChart3 },
   { href: "/automation", label: "Automation", icon: Workflow },
+  { href: "/integrations", label: "Integrations", icon: Plug },
 ];
 
 const RECORDS: NavItem[] = [

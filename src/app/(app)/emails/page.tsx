@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { Mail, CheckCircle2, AlertTriangle } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Badge, EmptyState, PageHeader } from "@/components/ui";
-import { mailConfigured } from "@/lib/mailer";
+import { mailStatusFor } from "@/lib/mailer";
 import { fromNow } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +16,8 @@ const STATUS_BADGE: Record<string, string> = {
 
 export default async function EmailsPage() {
   const user = await requireUser();
-  const configured = mailConfigured();
+  const status = await mailStatusFor(user.id);
+  const configured = status.configured;
   const emails = await prisma.emailMessage.findMany({
     where: { ownerId: user.id },
     orderBy: { createdAt: "desc" },
@@ -35,9 +37,17 @@ export default async function EmailsPage() {
         )}
       >
         {configured ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertTriangle className="h-4 w-4 shrink-0" />}
-        {configured
-          ? "SMTP is configured — emails send for real."
-          : "SMTP not configured. Add SMTP_* values to .env to send real emails; messages are still logged here."}
+        {configured ? (
+          <span>Email connected{status.from ? ` as ${status.from}` : ""} — automations send for real.</span>
+        ) : (
+          <span>
+            No email connected.{" "}
+            <Link href="/integrations" className="font-medium underline underline-offset-2">
+              Connect an account
+            </Link>{" "}
+            to send for real — messages are still logged here.
+          </span>
+        )}
       </div>
 
       {emails.length === 0 ? (
