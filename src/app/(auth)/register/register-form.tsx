@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { registerAction } from "@/lib/actions/auth";
-import { Field, Input } from "@/components/ui";
+import { Field, FormError, Input } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import type { FormState } from "@/lib/validation";
 
@@ -11,11 +11,7 @@ export function RegisterForm() {
 
   return (
     <form action={action} className="space-y-4">
-      {state.error && (
-        <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-          {state.error}
-        </div>
-      )}
+      {state.error && <FormError>{state.error}</FormError>}
       <Field label="Full name" htmlFor="name" error={state.fieldErrors?.name}>
         <Input id="name" name="name" autoComplete="name" placeholder="Jane Doe" required />
       </Field>

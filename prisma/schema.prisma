@@ -33,6 +33,10 @@ model Company {
   location  String?
   notes     String?
 
+  icpFit             String? // Excellent | Good | Medium | Low
+  estimatedArr       String? // display string, e.g. "$500M–$650M"
+  connectionStrength String? // Very strong | Strong | Medium | Low
+
   ownerId   String
   owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 

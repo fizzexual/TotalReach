@@ -9,7 +9,6 @@ function getSecret() {
   );
 }
 
-const PROTECTED = ["/dashboard", "/contacts", "/companies", "/deals", "/tasks", "/settings"];
 const AUTH_PAGES = ["/login", "/register"];
 
 async function isValidToken(token?: string) {
@@ -27,20 +26,23 @@ export async function proxy(req: NextRequest) {
   const token = req.cookies.get(COOKIE_NAME)?.value;
   const valid = await isValidToken(token);
 
-  const isProtected = PROTECTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
-  const isAuthPage = AUTH_PAGES.some((p) => pathname === p);
-
-  if (isProtected && !valid) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    url.search = pathname && pathname !== "/dashboard" ? `?next=${encodeURIComponent(pathname)}` : "";
-    return NextResponse.redirect(url);
+  if (AUTH_PAGES.includes(pathname)) {
+    if (valid) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/companies";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
-  if (isAuthPage && valid) {
+  // The root page decides where to send the user.
+  if (pathname === "/") return NextResponse.next();
+
+  if (!valid) {
     const url = req.nextUrl.clone();
-    url.pathname = "/dashboard";
-    url.search = "";
+    url.pathname = "/login";
+    url.search = `?next=${encodeURIComponent(pathname)}`;
     return NextResponse.redirect(url);
   }
 
@@ -48,14 +50,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/contacts/:path*",
-    "/companies/:path*",
-    "/deals/:path*",
-    "/tasks/:path*",
-    "/settings/:path*",
-    "/login",
-    "/register",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

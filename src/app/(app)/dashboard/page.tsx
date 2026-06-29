@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { startOfMonth } from "date-fns";
-import { Users, Building2, Target, Trophy, TrendingUp, ArrowUpRight } from "lucide-react";
+import { Users, Target, Trophy, TrendingUp, ArrowUpRight } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Badge, Card, EmptyState, PageHeader, SectionCard } from "@/components/ui";
@@ -25,20 +25,19 @@ function StatCard({
       <span className={cn("inline-flex h-10 w-10 items-center justify-center rounded-lg", accent)}>
         <Icon className="h-5 w-5" />
       </span>
-      <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
-      <p className="mt-1 text-sm text-slate-500">{label}</p>
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-zinc-100">{value}</p>
+      <p className="mt-1 text-sm text-zinc-400">{label}</p>
     </Card>
   );
 }
 
-export default async function DashboardPage() {
+export default async function ReportsPage() {
   const user = await requireUser();
   const ownerId = user.id;
   const monthStart = startOfMonth(new Date());
 
-  const [contactsCount, companiesCount, deals, recentActivities, upcomingTasks] = await Promise.all([
+  const [contactsCount, deals, recentActivities, upcomingTasks] = await Promise.all([
     prisma.contact.count({ where: { ownerId } }),
-    prisma.company.count({ where: { ownerId } }),
     prisma.deal.findMany({
       where: { ownerId },
       select: { id: true, value: true, stage: true, status: true, updatedAt: true },
@@ -64,36 +63,28 @@ export default async function DashboardPage() {
 
   const byStage = DEAL_STAGES.map((stage) => {
     const items = deals.filter((d) => d.stage === stage);
-    return {
-      stage,
-      count: items.length,
-      value: items.reduce((sum, d) => sum + d.value, 0),
-    };
+    return { stage, count: items.length, value: items.reduce((sum, d) => sum + d.value, 0) };
   });
   const maxStageValue = Math.max(1, ...byStage.map((s) => s.value));
-  const chartData = byStage
-    .filter((s) => s.stage !== "Lost")
-    .map((s) => ({ stage: s.stage, value: s.value }));
+  const chartData = byStage.filter((s) => s.stage !== "Lost").map((s) => ({ stage: s.stage, value: s.value }));
 
   return (
     <div>
-      <PageHeader title={`Welcome back, ${user.name.split(" ")[0]}`} subtitle="Here's what's happening across your pipeline." />
+      <PageHeader title="Reports" subtitle="Pipeline performance at a glance." />
 
-      {/* KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={TrendingUp} label="Open pipeline value" value={formatCurrency(pipelineValue)} accent="bg-indigo-50 text-indigo-600" />
-        <StatCard icon={Target} label="Open deals" value={formatNumber(openDeals.length)} accent="bg-violet-50 text-violet-600" />
-        <StatCard icon={Trophy} label="Won this month" value={formatCurrency(wonValueThisMonth)} accent="bg-emerald-50 text-emerald-600" />
-        <StatCard icon={Users} label="Contacts" value={formatNumber(contactsCount)} accent="bg-sky-50 text-sky-600" />
+        <StatCard icon={TrendingUp} label="Open pipeline value" value={formatCurrency(pipelineValue)} accent="bg-emerald-500/10 text-emerald-400" />
+        <StatCard icon={Target} label="Open deals" value={formatNumber(openDeals.length)} accent="bg-violet-500/10 text-violet-400" />
+        <StatCard icon={Trophy} label="Won this month" value={formatCurrency(wonValueThisMonth)} accent="bg-amber-500/10 text-amber-400" />
+        <StatCard icon={Users} label="People" value={formatNumber(contactsCount)} accent="bg-sky-500/10 text-sky-400" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Pipeline chart */}
         <SectionCard
           title="Pipeline value by stage"
           className="lg:col-span-2"
           action={
-            <Link href="/deals" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+            <Link href="/deals" className="inline-flex items-center gap-1 text-sm font-medium text-emerald-400 hover:text-emerald-300">
               View board <ArrowUpRight className="h-4 w-4" />
             </Link>
           }
@@ -105,23 +96,19 @@ export default async function DashboardPage() {
           )}
         </SectionCard>
 
-        {/* Stage breakdown */}
         <SectionCard title="Stage breakdown">
           <ul className="space-y-3.5">
             {byStage.map((s) => (
               <li key={s.stage}>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2 text-slate-600">
+                  <span className="flex items-center gap-2 text-zinc-300">
                     <span className={cn("h-2 w-2 rounded-full", STAGE_META[s.stage].dot)} />
                     {s.stage}
                   </span>
-                  <span className="font-medium text-slate-900">{formatCurrency(s.value)}</span>
+                  <span className="font-medium text-zinc-100">{formatCurrency(s.value)}</span>
                 </div>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className={cn("h-full rounded-full", STAGE_META[s.stage].bar)}
-                    style={{ width: `${Math.round((s.value / maxStageValue) * 100)}%` }}
-                  />
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                  <div className={cn("h-full rounded-full", STAGE_META[s.stage].bar)} style={{ width: `${Math.round((s.value / maxStageValue) * 100)}%` }} />
                 </div>
               </li>
             ))}
@@ -130,30 +117,21 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Recent activity */}
         <SectionCard
           title="Recent activity"
-          action={
-            <Link href="/tasks" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
-              View all
-            </Link>
-          }
           bodyClassName="p-0"
+          action={<Link href="/tasks" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">View all</Link>}
         >
           {recentActivities.length === 0 ? (
-            <div className="p-5">
-              <EmptyState title="No activity yet" description="Log calls, emails, and notes to see them here." />
-            </div>
+            <p className="px-5 py-6 text-sm text-zinc-500">No activity yet.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-white/[0.05]">
               {recentActivities.map((a) => (
                 <li key={a.id} className="flex items-start gap-3 px-5 py-3.5">
-                  <Badge className={ACTIVITY_META[(a.type as ActivityType) ?? "Note"]?.badge ?? "bg-slate-100 text-slate-700"}>
-                    {a.type}
-                  </Badge>
+                  <Badge className={ACTIVITY_META[a.type as ActivityType]?.badge ?? "bg-zinc-500/15 text-zinc-300"}>{a.type}</Badge>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-slate-800">{a.title}</p>
-                    <p className="truncate text-xs text-slate-500">
+                    <p className="truncate text-sm font-medium text-zinc-200">{a.title}</p>
+                    <p className="truncate text-xs text-zinc-500">
                       {a.contact ? `${a.contact.firstName} ${a.contact.lastName}` : a.deal ? a.deal.title : "General"}
                       {" · "}
                       {fromNow(a.createdAt)}
@@ -165,36 +143,29 @@ export default async function DashboardPage() {
           )}
         </SectionCard>
 
-        {/* Tasks due */}
         <SectionCard
           title="Upcoming tasks"
-          action={
-            <Link href="/tasks" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
-              View all
-            </Link>
-          }
           bodyClassName="p-0"
+          action={<Link href="/tasks" className="text-sm font-medium text-emerald-400 hover:text-emerald-300">View all</Link>}
         >
           {upcomingTasks.length === 0 ? (
-            <div className="p-5">
-              <EmptyState title="You're all caught up" description="No upcoming tasks with a due date." />
-            </div>
+            <p className="px-5 py-6 text-sm text-zinc-500">You&apos;re all caught up.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-white/[0.05]">
               {upcomingTasks.map((t) => {
                 const state = dueState(t.dueDate);
                 return (
                   <li key={t.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-slate-800">{t.title}</p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="truncate text-sm font-medium text-zinc-200">{t.title}</p>
+                      <p className="truncate text-xs text-zinc-500">
                         {t.contact ? `${t.contact.firstName} ${t.contact.lastName}` : t.deal ? t.deal.title : t.type}
                       </p>
                     </div>
                     <span
                       className={cn(
                         "shrink-0 text-xs font-medium",
-                        state === "overdue" ? "text-rose-600" : state === "today" ? "text-amber-600" : "text-slate-500",
+                        state === "overdue" ? "text-rose-400" : state === "today" ? "text-amber-400" : "text-zinc-500",
                       )}
                     >
                       {formatDate(t.dueDate)}

@@ -19,7 +19,7 @@ const loginSchema = z.object({
 
 function safeNext(next: FormDataEntryValue | null): string {
   const v = typeof next === "string" ? next : "";
-  return v.startsWith("/") && !v.startsWith("//") ? v : "/dashboard";
+  return v.startsWith("/") && !v.startsWith("//") ? v : "/companies";
 }
 
 export async function registerAction(_prev: FormState, formData: FormData): Promise<FormState> {

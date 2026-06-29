@@ -26,7 +26,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Trash2 } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { Button } from "@/components/ui";
+import { Button, FormError } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { DealFields, type DealCardData, type Option } from "@/components/forms/deal-fields";
 import { DEAL_STAGES, STAGE_META, type DealStage } from "@/lib/constants";
@@ -56,10 +56,10 @@ function findContainerIn(cols: Columns, id: string): string | undefined {
 function CardBody({ deal }: { deal: DealCardData }) {
   return (
     <>
-      <p className="line-clamp-2 text-sm font-medium text-slate-800">{deal.title}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{formatCurrency(deal.value)}</p>
+      <p className="line-clamp-2 text-sm font-medium text-zinc-100">{deal.title}</p>
+      <p className="mt-1 text-sm font-semibold text-emerald-400">{formatCurrency(deal.value)}</p>
       {(deal.companyName || deal.contactName) && (
-        <p className="mt-1 truncate text-xs text-slate-400">{deal.companyName ?? deal.contactName}</p>
+        <p className="mt-1 truncate text-xs text-zinc-500">{deal.companyName ?? deal.contactName}</p>
       )}
     </>
   );
@@ -76,7 +76,7 @@ function DealCard({ deal, onClick }: { deal: DealCardData; onClick: () => void }
       {...listeners}
       onClick={onClick}
       className={cn(
-        "cursor-grab touch-none rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition active:cursor-grabbing hover:border-indigo-200",
+        "cursor-grab touch-none rounded-lg border border-white/10 bg-zinc-900 p-3 transition active:cursor-grabbing hover:border-emerald-500/30",
         isDragging && "opacity-40",
       )}
     >
@@ -101,16 +101,16 @@ function Column({
       <div className="mb-2 flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <span className={cn("h-2 w-2 rounded-full", STAGE_META[stage as DealStage]?.dot)} />
-          <span className="text-sm font-semibold text-slate-700">{stage}</span>
-          <span className="text-xs text-slate-400">{deals.length}</span>
+          <span className="text-sm font-semibold text-zinc-200">{stage}</span>
+          <span className="text-xs text-zinc-500">{deals.length}</span>
         </div>
-        <span className="text-xs font-medium text-slate-500">{formatCurrency(total)}</span>
+        <span className="text-xs font-medium text-zinc-400">{formatCurrency(total)}</span>
       </div>
       <div
         ref={setNodeRef}
         className={cn(
-          "flex min-h-[140px] flex-1 flex-col gap-2 rounded-xl bg-slate-100/70 p-2 transition",
-          isOver && "ring-2 ring-indigo-300",
+          "flex min-h-[140px] flex-1 flex-col gap-2 rounded-xl border border-white/[0.05] bg-white/[0.02] p-2 transition",
+          isOver && "border-emerald-500/40 ring-1 ring-emerald-500/30",
         )}
       >
         <SortableContext items={deals.map((d) => d.id)} strategy={verticalListSortingStrategy}>
@@ -118,9 +118,7 @@ function Column({
             <DealCard key={d.id} deal={d} onClick={() => onCardClick(d)} />
           ))}
         </SortableContext>
-        {deals.length === 0 && (
-          <p className="px-1 py-6 text-center text-xs text-slate-400">Drop deals here</p>
-        )}
+        {deals.length === 0 && <p className="px-1 py-6 text-center text-xs text-zinc-600">Drop deals here</p>}
       </div>
     </div>
   );
@@ -147,7 +145,6 @@ export function DealBoard({
 
   const didDragRef = React.useRef(false);
 
-  // Re-sync from the server whenever the underlying data changes.
   const signature = React.useMemo(
     () => deals.map((d) => `${d.id}:${d.stage}:${d.order}:${d.value}:${d.title}:${d.contactId}:${d.companyId}`).join("|"),
     [deals],
@@ -170,9 +167,7 @@ export function DealBoard({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const activeDeal = activeId
-    ? Object.values(columns).flat().find((d) => d.id === activeId) ?? null
-    : null;
+  const activeDeal = activeId ? Object.values(columns).flat().find((d) => d.id === activeId) ?? null : null;
 
   function handleDragStart(e: DragStartEvent) {
     didDragRef.current = true;
@@ -198,11 +193,7 @@ export function DealBoard({
       return {
         ...prev,
         [activeContainer]: activeItems.filter((d) => d.id !== activeId),
-        [overContainer]: [
-          ...overItems.slice(0, overIndex),
-          { ...moved, stage: overContainer },
-          ...overItems.slice(overIndex),
-        ],
+        [overContainer]: [...overItems.slice(0, overIndex), { ...moved, stage: overContainer }, ...overItems.slice(overIndex)],
       };
     });
   }
@@ -259,7 +250,7 @@ export function DealBoard({
         </div>
         <DragOverlay>
           {activeDeal ? (
-            <div className="w-64 rotate-1 rounded-lg border border-indigo-200 bg-white p-3 shadow-lg">
+            <div className="w-64 rotate-1 rounded-lg border border-emerald-500/40 bg-zinc-900 p-3 shadow-2xl">
               <CardBody deal={activeDeal} />
             </div>
           ) : null}
@@ -270,17 +261,13 @@ export function DealBoard({
         <Modal open onClose={() => setEditing(null)} title="Edit deal">
           <form key={editing.id} action={editAction} className="space-y-4">
             <input type="hidden" name="id" value={editing.id} />
-            {editState.error && (
-              <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                {editState.error}
-              </div>
-            )}
+            {editState.error && <FormError>{editState.error}</FormError>}
             <DealFields deal={editing} contacts={contacts} companies={companies} fieldErrors={editState.fieldErrors} />
             <div className="flex items-center justify-between pt-2">
               <Button
                 type="button"
                 variant="ghost"
-                className="text-rose-600 hover:bg-rose-50"
+                className="text-rose-400 hover:bg-rose-500/10"
                 onClick={async () => {
                   const id = editing.id;
                   if (window.confirm("Delete this deal? This cannot be undone.")) {

@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { Button, Field, Input, Select, Textarea, type ButtonVariant } from "@/components/ui";
+import { Button, Field, FormError, Input, Select, Textarea, type ButtonVariant } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { CONTACT_STATUSES } from "@/lib/constants";
 import type { FormState } from "@/lib/validation";
@@ -68,11 +68,7 @@ export function ContactFormModal({
       <Modal open={open} onClose={() => setOpen(false)} title={isEdit ? "Edit contact" : "New contact"}>
         <form action={formAction} className="space-y-4">
           {isEdit && <input type="hidden" name="id" value={contact!.id} />}
-          {state.error && (
-            <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-              {state.error}
-            </div>
-          )}
+          {state.error && <FormError>{state.error}</FormError>}
           <div className="grid grid-cols-2 gap-4">
             <Field label="First name" htmlFor="firstName" error={state.fieldErrors?.firstName}>
               <Input id="firstName" name="firstName" defaultValue={contact?.firstName ?? ""} required />

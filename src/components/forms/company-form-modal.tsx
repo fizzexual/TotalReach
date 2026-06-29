@@ -5,8 +5,9 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { Button, Field, Input, Textarea, type ButtonVariant } from "@/components/ui";
+import { Button, Field, FormError, Input, Select, Textarea, type ButtonVariant } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { ICP_FITS, CONNECTION_STRENGTHS } from "@/lib/constants";
 import type { FormState } from "@/lib/validation";
 import { createCompany, updateCompany } from "@/lib/actions/companies";
 
@@ -19,12 +20,15 @@ export type CompanyValues = {
   phone: string | null;
   location: string | null;
   notes: string | null;
+  icpFit: string | null;
+  estimatedArr: string | null;
+  connectionStrength: string | null;
 };
 
 export function CompanyFormModal({
   company,
   trigger,
-  triggerLabel = "New company",
+  triggerLabel = "Add company",
   triggerVariant = "primary",
 }: {
   company?: CompanyValues;
@@ -62,25 +66,51 @@ export function CompanyFormModal({
       <Modal open={open} onClose={() => setOpen(false)} title={isEdit ? "Edit company" : "New company"}>
         <form action={formAction} className="space-y-4">
           {isEdit && <input type="hidden" name="id" value={company!.id} />}
-          {state.error && (
-            <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-              {state.error}
-            </div>
-          )}
+          {state.error && <FormError>{state.error}</FormError>}
           <Field label="Company name" htmlFor="name" error={state.fieldErrors?.name}>
             <Input id="name" name="name" defaultValue={company?.name ?? ""} placeholder="Acme Inc." required />
           </Field>
           <div className="grid grid-cols-2 gap-4">
+            <Field label="Domain" htmlFor="domain">
+              <Input id="domain" name="domain" defaultValue={company?.domain ?? ""} placeholder="acme.com" />
+            </Field>
             <Field label="Industry" htmlFor="industry">
               <Input id="industry" name="industry" defaultValue={company?.industry ?? ""} placeholder="SaaS" />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Website" htmlFor="website">
+              <Input id="website" name="website" defaultValue={company?.website ?? ""} placeholder="https://acme.com" />
             </Field>
             <Field label="Location" htmlFor="location">
               <Input id="location" name="location" defaultValue={company?.location ?? ""} placeholder="San Francisco, CA" />
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Website" htmlFor="website">
-              <Input id="website" name="website" defaultValue={company?.website ?? ""} placeholder="https://acme.com" />
+            <Field label="ICP Fit" htmlFor="icpFit">
+              <Select id="icpFit" name="icpFit" defaultValue={company?.icpFit ?? ""}>
+                <option value="">— None —</option>
+                {ICP_FITS.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Connection strength" htmlFor="connectionStrength">
+              <Select id="connectionStrength" name="connectionStrength" defaultValue={company?.connectionStrength ?? ""}>
+                <option value="">— None —</option>
+                {CONNECTION_STRENGTHS.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Estimated ARR" htmlFor="estimatedArr">
+              <Input id="estimatedArr" name="estimatedArr" defaultValue={company?.estimatedArr ?? ""} placeholder="$500M–$650M" />
             </Field>
             <Field label="Phone" htmlFor="phone">
               <Input id="phone" name="phone" defaultValue={company?.phone ?? ""} placeholder="+1 555 000 0000" />

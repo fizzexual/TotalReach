@@ -25,18 +25,18 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <Icon className="h-4 w-4 shrink-0 text-slate-400" />
-      <span className="w-16 shrink-0 text-slate-400">{label}</span>
+      <Icon className="h-4 w-4 shrink-0 text-zinc-500" />
+      <span className="w-16 shrink-0 text-zinc-500">{label}</span>
       {value ? (
         href ? (
-          <Link href={href} className="truncate text-slate-700 hover:text-indigo-700">
+          <Link href={href} className="truncate text-zinc-200 hover:text-emerald-400">
             {value}
           </Link>
         ) : (
-          <span className="truncate text-slate-700">{value}</span>
+          <span className="truncate text-zinc-200">{value}</span>
         )
       ) : (
-        <span className="text-slate-300">—</span>
+        <span className="text-zinc-600">—</span>
       )}
     </div>
   );
@@ -65,21 +65,21 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div>
-      <Link href="/contacts" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
-        <ArrowLeft className="h-4 w-4" /> Back to contacts
+      <Link href="/contacts" className="mb-4 inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200">
+        <ArrowLeft className="h-4 w-4" /> People
       </Link>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Avatar name={fullName} className="h-14 w-14 text-lg" />
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{fullName}</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">{fullName}</h1>
+            <p className="text-sm text-zinc-400">
               {contact.title ?? "—"}
               {contact.company ? (
                 <>
                   {" · "}
-                  <Link href={`/companies/${contact.company.id}`} className="text-indigo-600 hover:text-indigo-700">
+                  <Link href={`/companies/${contact.company.id}`} className="text-emerald-400 hover:text-emerald-300">
                     {contact.company.name}
                   </Link>
                 </>
@@ -110,7 +110,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
           <form action={deleteContact}>
             <input type="hidden" name="id" value={contact.id} />
             <ConfirmButton type="submit" variant="ghost" size="icon" message={`Delete ${fullName}? This cannot be undone.`}>
-              <Trash2 className="h-4 w-4 text-slate-400" />
+              <Trash2 className="h-4 w-4 text-zinc-400" />
             </ConfirmButton>
           </form>
         </div>
@@ -130,9 +130,9 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
                 href={contact.company ? `/companies/${contact.company.id}` : undefined}
               />
             </dl>
-            <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4">
-              <span className="text-sm text-slate-500">Status</span>
-              <Badge className={CONTACT_STATUS_BADGE[contact.status as ContactStatus] ?? "bg-slate-100 text-slate-600"}>
+            <div className="mt-4 flex items-center gap-2 border-t border-white/[0.07] pt-4">
+              <span className="text-sm text-zinc-500">Status</span>
+              <Badge className={CONTACT_STATUS_BADGE[contact.status as ContactStatus] ?? "bg-zinc-500/15 text-zinc-400"}>
                 {contact.status}
               </Badge>
             </div>
@@ -140,27 +140,27 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
 
           {contact.notes && (
             <SectionCard title="Notes">
-              <p className="whitespace-pre-line text-sm text-slate-600">{contact.notes}</p>
+              <p className="whitespace-pre-line text-sm text-zinc-300">{contact.notes}</p>
             </SectionCard>
           )}
         </div>
 
         <div className="space-y-6 lg:col-span-2">
-          <SectionCard title="Deals" bodyClassName="p-0" action={<span className="text-sm text-slate-400">{contact.deals.length}</span>}>
+          <SectionCard title="Deals" bodyClassName="p-0" action={<span className="text-sm text-zinc-500">{contact.deals.length}</span>}>
             {contact.deals.length === 0 ? (
-              <p className="px-5 py-6 text-sm text-slate-500">No deals linked to this contact.</p>
+              <p className="px-5 py-6 text-sm text-zinc-500">No deals linked to this person.</p>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-white/[0.05]">
                 {contact.deals.map((d) => (
                   <li key={d.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
                     <Link href="/deals" className="min-w-0">
-                      <span className="block truncate font-medium text-slate-800 hover:text-indigo-700">{d.title}</span>
-                      <span className="text-xs text-slate-400">
+                      <span className="block truncate font-medium text-zinc-200 hover:text-emerald-400">{d.title}</span>
+                      <span className="text-xs text-zinc-500">
                         {formatCurrency(d.value)}
                         {d.closeDate ? ` · closes ${formatDate(d.closeDate)}` : ""}
                       </span>
                     </Link>
-                    <Badge className={STAGE_META[d.stage as DealStage]?.badge ?? "bg-slate-100 text-slate-700"}>{d.stage}</Badge>
+                    <Badge className={STAGE_META[d.stage as DealStage]?.badge ?? "bg-zinc-500/15 text-zinc-400"}>{d.stage}</Badge>
                   </li>
                 ))}
               </ul>

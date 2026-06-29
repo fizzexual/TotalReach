@@ -59,14 +59,14 @@ export default async function TasksPage({
         <ActivityFormModal contacts={contactOptions} deals={dealOptions} triggerLabel="Log activity" triggerVariant="primary" />
       </PageHeader>
 
-      <div className="mb-4 inline-flex rounded-lg border border-slate-200 bg-white p-1 text-sm">
+      <div className="mb-4 inline-flex rounded-lg border border-white/10 bg-white/[0.03] p-1 text-sm">
         {FILTERS.map((t) => (
           <Link
             key={t.key}
             href={`/tasks?filter=${t.key}`}
             className={cn(
               "rounded-md px-3 py-1.5 font-medium transition",
-              filter === t.key ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:text-slate-800",
+              filter === t.key ? "bg-emerald-500/15 text-emerald-300" : "text-zinc-400 hover:text-zinc-200",
             )}
           >
             {t.label}

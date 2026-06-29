@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { Button } from "@/components/ui";
+import { Button, FormError } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { DealFields, type Option } from "@/components/forms/deal-fields";
 import type { FormState } from "@/lib/validation";
@@ -30,11 +30,7 @@ export function DealFormModal({ contacts, companies }: { contacts: Option[]; com
       </Button>
       <Modal open={open} onClose={() => setOpen(false)} title="New deal">
         <form action={formAction} className="space-y-4">
-          {state.error && (
-            <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-              {state.error}
-            </div>
-          )}
+          {state.error && <FormError>{state.error}</FormError>}
           <DealFields contacts={contacts} companies={companies} fieldErrors={state.fieldErrors} />
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>

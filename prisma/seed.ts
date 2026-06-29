@@ -22,13 +22,20 @@ async function main() {
   });
   const ownerId = user.id;
 
+  // Companies — order matches the "Top companies" view.
   const companyData = [
-    { key: "acme", name: "Acme Inc.", industry: "SaaS", location: "San Francisco, CA", website: "https://acme.example.com", domain: "acme.example.com", phone: "+1 415 555 0101" },
-    { key: "globex", name: "Globex Corporation", industry: "Manufacturing", location: "Chicago, IL", website: "https://globex.example.com", domain: "globex.example.com", phone: "+1 312 555 0144" },
-    { key: "initech", name: "Initech", industry: "Fintech", location: "Austin, TX", website: "https://initech.example.com", domain: "initech.example.com", phone: "+1 512 555 0188" },
-    { key: "umbrella", name: "Umbrella Health", industry: "Healthcare", location: "Boston, MA", website: "https://umbrella.example.com", domain: "umbrella.example.com", phone: "+1 617 555 0199" },
-    { key: "hooli", name: "Hooli", industry: "Technology", location: "Palo Alto, CA", website: "https://hooli.example.com", domain: "hooli.example.com", phone: "+1 650 555 0123" },
-    { key: "soylent", name: "Soylent Co.", industry: "Food & Beverage", location: "New York, NY", website: "https://soylent.example.com", domain: "soylent.example.com", phone: "+1 212 555 0177" },
+    { key: "shopify", name: "Shopify", domain: "shopify.com", industry: "E-commerce", location: "Ottawa, CA", icpFit: "Excellent", estimatedArr: "$500M-$650M", connectionStrength: "Very strong" },
+    { key: "stripe", name: "Stripe", domain: "stripe.com", industry: "Fintech", location: "San Francisco, CA", icpFit: "Medium", estimatedArr: "$650M-$800M", connectionStrength: "Strong" },
+    { key: "adobe", name: "Adobe", domain: "adobe.com", industry: "Software", location: "San Jose, CA", icpFit: "Low", estimatedArr: "$800M-$950M", connectionStrength: "Very strong" },
+    { key: "miro", name: "Miro", domain: "miro.com", industry: "SaaS", location: "Amsterdam, NL", icpFit: "Medium", estimatedArr: "$950M-$1.1B", connectionStrength: "Strong" },
+    { key: "zoom", name: "Zoom", domain: "zoom.com", industry: "Communications", location: "San Jose, CA", icpFit: "Medium", estimatedArr: "$1.1B-$1.25B", connectionStrength: "Very strong" },
+    { key: "roku", name: "Roku", domain: "roku.com", industry: "Streaming", location: "San Jose, CA", icpFit: "Medium", estimatedArr: "$1.25B-$1.4B", connectionStrength: "Very strong" },
+    { key: "dropbox", name: "Dropbox", domain: "dropbox.com", industry: "Cloud Storage", location: "San Francisco, CA", icpFit: "Excellent", estimatedArr: "$1.4B-$1.6B", connectionStrength: "Low" },
+    { key: "linktree", name: "Linktree", domain: "linktree.com", industry: "SaaS", location: "Melbourne, AU", icpFit: "Excellent", estimatedArr: "$1.6B-$1.8B", connectionStrength: "Strong" },
+    { key: "loom", name: "Loom", domain: "loom.com", industry: "SaaS", location: "San Francisco, CA", icpFit: "Medium", estimatedArr: "$1.8B-$2B", connectionStrength: "Very strong" },
+    { key: "airbnb", name: "Airbnb", domain: "airbnb.com", industry: "Travel", location: "San Francisco, CA", icpFit: "Good", estimatedArr: "$2B-$2.25B", connectionStrength: "Low" },
+    { key: "finofo", name: "Finofo", domain: "finofo.com", industry: "Fintech", location: "Toronto, CA", icpFit: "Low", estimatedArr: "$2.25B-$2.5B", connectionStrength: "Strong" },
+    { key: "amie", name: "Amie", domain: "amie.com", industry: "Productivity", location: "Berlin, DE", icpFit: "Good", estimatedArr: "$2.5B-$2.75B", connectionStrength: "Very strong" },
   ];
 
   const companies: Record<string, string> = {};
@@ -38,19 +45,20 @@ async function main() {
     companies[key] = created.id;
   }
 
+  // One primary contact per company.
   const contactData = [
-    { key: "jane", firstName: "Jane", lastName: "Cooper", title: "Head of Sales", email: "jane.cooper@acme.example.com", phone: "+1 415 555 0102", status: "Active", company: "acme" },
-    { key: "wade", firstName: "Wade", lastName: "Warren", title: "VP Operations", email: "wade.warren@acme.example.com", phone: "+1 415 555 0103", status: "Active", company: "acme" },
-    { key: "esther", firstName: "Esther", lastName: "Howard", title: "Procurement Lead", email: "esther.howard@globex.example.com", phone: "+1 312 555 0145", status: "Lead", company: "globex" },
-    { key: "cameron", firstName: "Cameron", lastName: "Williamson", title: "CTO", email: "cameron@globex.example.com", phone: "+1 312 555 0146", status: "Active", company: "globex" },
-    { key: "brooklyn", firstName: "Brooklyn", lastName: "Simmons", title: "Finance Director", email: "brooklyn@initech.example.com", phone: "+1 512 555 0189", status: "Lead", company: "initech" },
-    { key: "leslie", firstName: "Leslie", lastName: "Alexander", title: "Office Manager", email: "leslie@initech.example.com", phone: "+1 512 555 0190", status: "Inactive", company: "initech" },
-    { key: "guy", firstName: "Guy", lastName: "Hawkins", title: "Chief Medical Officer", email: "guy.hawkins@umbrella.example.com", phone: "+1 617 555 0200", status: "Active", company: "umbrella" },
-    { key: "robert", firstName: "Robert", lastName: "Fox", title: "Head of IT", email: "robert.fox@umbrella.example.com", phone: "+1 617 555 0201", status: "Lead", company: "umbrella" },
-    { key: "jacob", firstName: "Jacob", lastName: "Jones", title: "Product Lead", email: "jacob.jones@hooli.example.com", phone: "+1 650 555 0124", status: "Active", company: "hooli" },
-    { key: "kristin", firstName: "Kristin", lastName: "Watson", title: "Growth Manager", email: "kristin@hooli.example.com", phone: "+1 650 555 0125", status: "Lead", company: "hooli" },
-    { key: "dianne", firstName: "Dianne", lastName: "Russell", title: "Supply Chain Manager", email: "dianne@soylent.example.com", phone: "+1 212 555 0178", status: "Active", company: "soylent" },
-    { key: "marvin", firstName: "Marvin", lastName: "McKinney", title: "Founder", email: "marvin@soylent.example.com", phone: "+1 212 555 0179", status: "Lead", company: "soylent" },
+    { key: "harley", firstName: "Harley", lastName: "Finkelstein", title: "President", email: "harley@shopify.com", status: "Active", company: "shopify" },
+    { key: "patrick", firstName: "Patrick", lastName: "Collison", title: "CEO", email: "patrick@stripe.com", status: "Active", company: "stripe" },
+    { key: "shantanu", firstName: "Shantanu", lastName: "Narayen", title: "CEO", email: "shantanu@adobe.com", status: "Lead", company: "adobe" },
+    { key: "andrey", firstName: "Andrey", lastName: "Khusid", title: "CEO", email: "andrey@miro.com", status: "Active", company: "miro" },
+    { key: "eric", firstName: "Eric", lastName: "Yuan", title: "CEO", email: "eric@zoom.com", status: "Lead", company: "zoom" },
+    { key: "anthony", firstName: "Anthony", lastName: "Wood", title: "Founder", email: "anthony@roku.com", status: "Lead", company: "roku" },
+    { key: "drew", firstName: "Drew", lastName: "Houston", title: "CEO", email: "drew@dropbox.com", status: "Active", company: "dropbox" },
+    { key: "alex", firstName: "Alex", lastName: "Zaccaria", title: "CEO", email: "alex@linktree.com", status: "Active", company: "linktree" },
+    { key: "joe", firstName: "Joe", lastName: "Thomas", title: "CEO", email: "joe@loom.com", status: "Lead", company: "loom" },
+    { key: "brian", firstName: "Brian", lastName: "Chesky", title: "CEO", email: "brian@airbnb.com", status: "Active", company: "airbnb" },
+    { key: "nima", firstName: "Nima", lastName: "Gardideh", title: "Co-founder", email: "nima@finofo.com", status: "Lead", company: "finofo" },
+    { key: "dennis", firstName: "Dennis", lastName: "Mueller", title: "CEO", email: "dennis@amie.com", status: "Lead", company: "amie" },
   ];
 
   const contacts: Record<string, string> = {};
@@ -62,27 +70,32 @@ async function main() {
     contacts[key] = created.id;
   }
 
+  // Associated deals (named after the company, like the screenshot).
   const dealData = [
-    { key: "acme-ent", title: "Acme — Annual Enterprise plan", value: 48000, stage: "Negotiation", order: 0, contact: "jane", company: "acme", closeInDays: 18 },
-    { key: "acme-addon", title: "Acme — Analytics add-on", value: 12000, stage: "Proposal", order: 0, contact: "wade", company: "acme", closeInDays: 30 },
-    { key: "globex-rollout", title: "Globex — Team rollout", value: 36000, stage: "Qualified", order: 0, contact: "cameron", company: "globex", closeInDays: 45 },
-    { key: "globex-pilot", title: "Globex — Pilot program", value: 8000, stage: "Lead", order: 0, contact: "esther", company: "globex", closeInDays: 60 },
-    { key: "initech-migration", title: "Initech — CRM migration", value: 22000, stage: "Proposal", order: 1, contact: "brooklyn", company: "initech", closeInDays: 25 },
-    { key: "umbrella-platform", title: "Umbrella — Platform license", value: 64000, stage: "Negotiation", order: 1, contact: "guy", company: "umbrella", closeInDays: 12 },
-    { key: "umbrella-support", title: "Umbrella — Premium support", value: 15000, stage: "Qualified", order: 1, contact: "robert", company: "umbrella", closeInDays: 50 },
-    { key: "hooli-expansion", title: "Hooli — Seat expansion", value: 28000, stage: "Won", order: 0, contact: "jacob", company: "hooli", closeInDays: -5 },
-    { key: "hooli-trial", title: "Hooli — Growth trial", value: 9000, stage: "Lead", order: 1, contact: "kristin", company: "hooli", closeInDays: 40 },
-    { key: "soylent-supply", title: "Soylent — Supply integration", value: 31000, stage: "Won", order: 1, contact: "dianne", company: "soylent", closeInDays: -12 },
-    { key: "soylent-founder", title: "Soylent — Founder package", value: 5000, stage: "Lost", order: 0, contact: "marvin", company: "soylent", closeInDays: -20 },
+    { key: "shopify", title: "Shopify", value: 540000, stage: "Negotiation", company: "shopify", contact: "harley", closeInDays: 18 },
+    { key: "stripe", title: "Stripe", value: 720000, stage: "Qualified", company: "stripe", contact: "patrick", closeInDays: 40 },
+    { key: "adobe", title: "Adobe", value: 880000, stage: "Proposal", company: "adobe", contact: "shantanu", closeInDays: 25 },
+    { key: "adobe-creative", title: "Adobe - Creative", value: 220000, stage: "Lead", company: "adobe", contact: "shantanu", closeInDays: 55 },
+    { key: "miro", title: "Miro", value: 1020000, stage: "Qualified", company: "miro", contact: "andrey", closeInDays: 35 },
+    { key: "zoom", title: "Zoom", value: 1180000, stage: "Won", company: "zoom", contact: "eric", closeInDays: -8 },
+    { key: "roku", title: "Roku", value: 1320000, stage: "Lead", company: "roku", contact: "anthony", closeInDays: 60 },
+    { key: "dropbox", title: "Dropbox", value: 1500000, stage: "Proposal", company: "dropbox", contact: "drew", closeInDays: 20 },
+    { key: "linktree", title: "Linktree", value: 1700000, stage: "Negotiation", company: "linktree", contact: "alex", closeInDays: 12 },
+    { key: "loom", title: "Loom", value: 1900000, stage: "Qualified", company: "loom", contact: "joe", closeInDays: 45 },
+    { key: "airbnb", title: "Airbnb", value: 2100000, stage: "Won", company: "airbnb", contact: "brian", closeInDays: -15 },
+    { key: "finofo", title: "Finofo", value: 2350000, stage: "Lead", company: "finofo", contact: "nima", closeInDays: 50 },
+    { key: "amie", title: "Amie", value: 2600000, stage: "Proposal", company: "amie", contact: "dennis", closeInDays: 30 },
   ];
 
   const deals: Record<string, string> = {};
+  let order = 0;
   for (const d of dealData) {
     const { key, contact, company, closeInDays, ...rest } = d;
     const created = await prisma.deal.create({
       data: {
         ...rest,
         status: statusForStage(rest.stage),
+        order: order++,
         closeDate: closeInDays != null ? addDays(new Date(), closeInDays) : null,
         contactId: contacts[contact] ?? null,
         companyId: companies[company] ?? null,
@@ -93,19 +106,17 @@ async function main() {
   }
 
   const activityData = [
-    { type: "Call", title: "Discovery call with Jane", notes: "Walked through pipeline needs. Strong fit.", contact: "jane", deal: "acme-ent", dueInDays: -3, completed: true },
-    { type: "Email", title: "Send Acme proposal", notes: "Include analytics add-on pricing.", contact: "wade", deal: "acme-addon", dueInDays: 1, completed: false },
-    { type: "Meeting", title: "Globex technical review", notes: "Cameron wants SSO + audit logs.", contact: "cameron", deal: "globex-rollout", dueInDays: 2, completed: false },
-    { type: "Task", title: "Follow up with Esther", contact: "esther", deal: "globex-pilot", dueInDays: -1, completed: false },
-    { type: "Call", title: "Initech migration scoping", contact: "brooklyn", deal: "initech-migration", dueInDays: 4, completed: false },
-    { type: "Meeting", title: "Umbrella contract negotiation", notes: "Legal to review MSA.", contact: "guy", deal: "umbrella-platform", dueInDays: 0, completed: false },
-    { type: "Note", title: "Robert prefers quarterly billing", contact: "robert", deal: "umbrella-support", completed: false },
-    { type: "Email", title: "Hooli onboarding kickoff", contact: "jacob", deal: "hooli-expansion", dueInDays: -6, completed: true },
-    { type: "Task", title: "Prepare Q3 pipeline report", dueInDays: 5, completed: false },
-    { type: "Call", title: "Reconnect with Kristin", contact: "kristin", deal: "hooli-trial", dueInDays: 7, completed: false },
-    { type: "Meeting", title: "Soylent integration handoff", contact: "dianne", deal: "soylent-supply", dueInDays: -10, completed: true },
-    { type: "Note", title: "Soylent founder deal lost to competitor", contact: "marvin", deal: "soylent-founder", completed: true },
-    { type: "Task", title: "Update CRM data hygiene checklist", dueInDays: 3, completed: false },
+    { type: "Call", title: "Discovery call with Harley", contact: "harley", deal: "shopify", dueInDays: -3, completed: true },
+    { type: "Email", title: "Send Stripe proposal", contact: "patrick", deal: "stripe", dueInDays: 1, completed: false },
+    { type: "Meeting", title: "Adobe Creative scoping", contact: "shantanu", deal: "adobe-creative", dueInDays: 2, completed: false },
+    { type: "Task", title: "Follow up with Miro", contact: "andrey", deal: "miro", dueInDays: -1, completed: false },
+    { type: "Meeting", title: "Dropbox security review", contact: "drew", deal: "dropbox", dueInDays: 0, completed: false },
+    { type: "Note", title: "Linktree wants annual billing", contact: "alex", deal: "linktree", completed: false },
+    { type: "Email", title: "Zoom onboarding kickoff", contact: "eric", deal: "zoom", dueInDays: -6, completed: true },
+    { type: "Task", title: "Prepare Q3 pipeline report", dueInDays: 4, completed: false },
+    { type: "Call", title: "Reconnect with Loom", contact: "joe", deal: "loom", dueInDays: 7, completed: false },
+    { type: "Meeting", title: "Airbnb integration handoff", contact: "brian", deal: "airbnb", dueInDays: -10, completed: true },
+    { type: "Task", title: "Clean up duplicate records", dueInDays: 3, completed: false },
   ];
 
   for (const a of activityData) {
@@ -123,14 +134,13 @@ async function main() {
     });
   }
 
-  const counts = {
+  console.log(`Seeded demo workspace for ${DEMO_EMAIL} (password: password123)`);
+  console.log({
     companies: companyData.length,
     contacts: contactData.length,
     deals: dealData.length,
     activities: activityData.length,
-  };
-  console.log(`Seeded demo workspace for ${DEMO_EMAIL} (password: password123)`);
-  console.log(counts);
+  });
 }
 
 main()

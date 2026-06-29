@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { Button, Field, Input, Select, Textarea, type ButtonVariant } from "@/components/ui";
+import { Button, Field, FormError, Input, Select, Textarea, type ButtonVariant } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { ACTIVITY_TYPES } from "@/lib/constants";
 import type { FormState } from "@/lib/validation";
@@ -46,11 +46,7 @@ export function ActivityFormModal({
           {preset?.contactId && <input type="hidden" name="contactId" value={preset.contactId} />}
           {preset?.dealId && <input type="hidden" name="dealId" value={preset.dealId} />}
           {preset?.companyId && <input type="hidden" name="companyId" value={preset.companyId} />}
-          {state.error && (
-            <div className="rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-              {state.error}
-            </div>
-          )}
+          {state.error && <FormError>{state.error}</FormError>}
           <div className="grid grid-cols-2 gap-4">
             <Field label="Type" htmlFor="type">
               <Select id="type" name="type" defaultValue={preset?.type ?? "Task"}>

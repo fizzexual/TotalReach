@@ -19,7 +19,7 @@ export function ProfileForm({ name, email }: { name: string; email: string }) {
   return (
     <form action={action} className="space-y-4">
       {state.ok && (
-        <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
           Profile updated.
         </div>
       )}

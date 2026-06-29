@@ -4,13 +4,14 @@ A full-stack CRM web application — the working product behind a "Luman"-style 
 Manage contacts, companies, a drag-and-drop deal pipeline, and tasks/activities in one clean,
 focused workspace.
 
-> Built with Next.js (App Router) + TypeScript + Tailwind CSS + Prisma/SQLite.
+> A dark, Attio-style data-table interface built with Next.js (App Router) + TypeScript + Tailwind CSS + Prisma/SQLite.
 
 ## Features
 
 - **Authentication** — email/password sign-up & sign-in, hashed passwords (bcrypt), JWT session in an httpOnly cookie, route protection via Next.js proxy (middleware).
 - **Dashboard** — KPIs (open pipeline value, open deals, won this month, contacts), a pipeline-by-stage chart, stage breakdown, recent activity, and upcoming tasks.
-- **Contacts & Companies** — full create / edit / delete, search, and detail pages with linked deals and activities.
+- **Companies** — a spreadsheet-style data table (domains, associated deals, ICP Fit, estimated ARR, connection strength) with full create / edit / delete and detail pages.
+- **People** — searchable contacts table with company links, statuses, and detail pages.
 - **Deal pipeline** — a Kanban board with drag-and-drop across stages (Lead → Qualified → Proposal → Negotiation → Won / Lost), per-column value totals, and inline create/edit.
 - **Tasks & activities** — calls, emails, meetings, notes and to-dos linked to contacts and deals, with due dates, overdue/today highlighting, and a one-click "done" toggle.
 - **Settings** — edit your profile; view account details.

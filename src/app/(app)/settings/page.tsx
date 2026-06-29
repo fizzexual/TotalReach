@@ -20,15 +20,15 @@ export default async function SettingsPage() {
         <SectionCard title="Account">
           <dl className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
-              <dt className="text-slate-500">Email</dt>
-              <dd className="font-medium text-slate-800">{user.email}</dd>
+              <dt className="text-zinc-500">Email</dt>
+              <dd className="font-medium text-zinc-200">{user.email}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-slate-500">Member since</dt>
-              <dd className="font-medium text-slate-800">{formatDate(user.createdAt)}</dd>
+              <dt className="text-zinc-500">Member since</dt>
+              <dd className="font-medium text-zinc-200">{formatDate(user.createdAt)}</dd>
             </div>
           </dl>
-          <form action={logoutAction} className="mt-5 border-t border-slate-100 pt-4">
+          <form action={logoutAction} className="mt-5 border-t border-white/[0.07] pt-4">
             <Button type="submit" variant="secondary">
               <LogOut className="h-4 w-4" /> Sign out
             </Button>

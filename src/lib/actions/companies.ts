@@ -6,10 +6,16 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fieldErrors, optionalText, type FormState } from "@/lib/validation";
+import { ICP_FITS, CONNECTION_STRENGTHS } from "@/lib/constants";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Company name is required").max(120),
 });
+
+function normalizeEnum(v: FormDataEntryValue | null, allowed: readonly string[]): string | null {
+  const s = typeof v === "string" ? v.trim() : "";
+  return allowed.includes(s) ? s : null;
+}
 
 function readInput(formData: FormData) {
   return {
@@ -19,6 +25,9 @@ function readInput(formData: FormData) {
     phone: optionalText(formData.get("phone")),
     location: optionalText(formData.get("location")),
     notes: optionalText(formData.get("notes")),
+    icpFit: normalizeEnum(formData.get("icpFit"), ICP_FITS),
+    estimatedArr: optionalText(formData.get("estimatedArr")),
+    connectionStrength: normalizeEnum(formData.get("connectionStrength"), CONNECTION_STRENGTHS),
   };
 }
 
