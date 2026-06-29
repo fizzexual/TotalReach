@@ -18,6 +18,7 @@ async function main() {
   const existing = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
   let user;
   if (existing) {
+    await prisma.automation.deleteMany({ where: { ownerId: existing.id } });
     await prisma.activity.deleteMany({ where: { ownerId: existing.id } });
     await prisma.deal.deleteMany({ where: { ownerId: existing.id } });
     await prisma.contact.deleteMany({ where: { ownerId: existing.id } });
@@ -140,12 +141,36 @@ async function main() {
     });
   }
 
+  // Example automation matching the flow builder reference.
+  const automation = await prisma.automation.create({
+    data: {
+      name: "Re-engage warm leads",
+      description: "Follow up when a marketing email is opened",
+      triggerType: "email_opened",
+      triggerLabel: "When email opened",
+      enabled: true,
+      lastRunAt: new Date(),
+      ownerId,
+    },
+  });
+  const automationSteps = [
+    { kind: "Action", type: "send_email", title: "Send email", subtitle: 'Send "Follow-up offer email"' },
+    { kind: "Condition", type: "condition", title: "Condition", subtitle: "Wait before checking condition", condField: "Email opened", condOperator: "is", condValue: "true" },
+    { kind: "Action", type: "add_to_list", title: "Add to list", subtitle: 'Add contact to "Engaged"' },
+  ];
+  for (let i = 0; i < automationSteps.length; i++) {
+    await prisma.automationStep.create({
+      data: { automationId: automation.id, order: i, status: "Completed", ...automationSteps[i] },
+    });
+  }
+
   console.log(`Seeded demo workspace for ${DEMO_EMAIL} (password: password123)`);
   console.log({
     companies: companyData.length,
     contacts: contactData.length,
     deals: dealData.length,
     activities: activityData.length,
+    automations: 1,
   });
 }
 

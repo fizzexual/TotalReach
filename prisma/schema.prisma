@@ -21,6 +21,7 @@ model User {
   contacts     Contact[]
   deals        Deal[]
   activities   Activity[]
+  automations  Automation[]
 }
 
 model Company {
@@ -94,6 +95,41 @@ model Deal {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Automation {
+  id           String    @id @default(cuid())
+  name         String
+  description  String?
+  enabled      Boolean   @default(true)
+  triggerType  String    @default("email_opened")
+  triggerLabel String    @default("When email opened")
+  lastRunAt    DateTime?
+
+  ownerId   String
+  owner     User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  steps     AutomationStep[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AutomationStep {
+  id           String  @id @default(cuid())
+  order        Int     @default(0)
+  kind         String  // Action | Condition
+  type         String  @default("send_email")
+  title        String
+  subtitle     String?
+  condField    String?
+  condOperator String?
+  condValue    String?
+  status       String  @default("Idle") // Idle | Completed
+
+  automationId String
+  automation   Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model Activity {
