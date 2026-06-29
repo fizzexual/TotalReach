@@ -22,6 +22,7 @@ model User {
   deals        Deal[]
   activities   Activity[]
   automations  Automation[]
+  emails       EmailMessage[]
 }
 
 model Company {
@@ -67,6 +68,7 @@ model Contact {
 
   deals      Deal[]
   activities Activity[]
+  emails     EmailMessage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,6 +123,8 @@ model AutomationStep {
   type         String  @default("send_email")
   title        String
   subtitle     String?
+  emailSubject String?
+  emailBody    String?
   condField    String?
   condOperator String?
   condValue    String?
@@ -128,6 +132,27 @@ model AutomationStep {
 
   automationId String
   automation   Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model EmailMessage {
+  id           String    @id @default(cuid())
+  to           String
+  subject      String
+  body         String
+  status       String    @default("queued") // queued | sent | failed | skipped
+  error        String?
+  source       String    @default("manual") // manual | automation | test
+  trackToken   String    @unique @default(cuid())
+  opens        Int       @default(0)
+  openedAt     DateTime?
+  automationId String?
+
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 }

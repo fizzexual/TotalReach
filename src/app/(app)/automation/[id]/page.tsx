@@ -62,6 +62,8 @@ export default async function AutomationBuilderPage({ params }: { params: Promis
     type: s.type,
     title: s.title,
     subtitle: s.subtitle,
+    emailSubject: s.emailSubject,
+    emailBody: s.emailBody,
     condField: s.condField,
     condOperator: s.condOperator,
     condValue: s.condValue,
@@ -99,7 +101,7 @@ export default async function AutomationBuilderPage({ params }: { params: Promis
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <RunControls automationId={automation.id} hasRun={hasRun} />
+          <RunControls automationId={automation.id} hasRun={hasRun} defaultEmail={user.email} />
           <form action={toggleAutomation}>
             <input type="hidden" name="id" value={automation.id} />
             <Button type="submit" variant={automation.enabled ? "secondary" : "ghost"}>

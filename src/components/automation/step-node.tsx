@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { Modal } from "@/components/modal";
-import { Button, Field, FormError, Input, Select } from "@/components/ui";
+import { Button, Field, FormError, Input, Select, Textarea } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { NodeCard, StatusPill } from "@/components/automation/node-card";
 import { getAction, ACTION_OPTIONS, CONDITION_FIELDS, CONDITION_OPERATORS } from "@/lib/automation";
@@ -18,6 +18,8 @@ export type StepData = {
   type: string;
   title: string;
   subtitle: string | null;
+  emailSubject: string | null;
+  emailBody: string | null;
   condField: string | null;
   condOperator: string | null;
   condValue: string | null;
@@ -103,8 +105,14 @@ export function StepNode({ step }: { step: StepData }) {
               <Field label="Label" htmlFor="title">
                 <Input id="title" name="title" defaultValue={step.title} placeholder="Send email" />
               </Field>
-              <Field label="Description" htmlFor="subtitle">
+              <Field label="Card description" htmlFor="subtitle">
                 <Input id="subtitle" name="subtitle" defaultValue={step.subtitle ?? ""} placeholder='Send "Follow-up offer email"' />
+              </Field>
+              <Field label="Email subject" htmlFor="emailSubject" hint="Used when the action is Send email.">
+                <Input id="emailSubject" name="emailSubject" defaultValue={step.emailSubject ?? ""} placeholder="Quick follow-up" />
+              </Field>
+              <Field label="Email body" htmlFor="emailBody">
+                <Textarea id="emailBody" name="emailBody" defaultValue={step.emailBody ?? ""} placeholder="Write the email your contact will receive…" />
               </Field>
             </>
           )}

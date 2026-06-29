@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fieldErrors, optionalText, optionalDate, toNumber, type FormState } from "@/lib/validation";
 import { DEAL_STAGES } from "@/lib/constants";
+import { runAutomationsForTrigger } from "@/lib/automation-engine";
 
 const schema = z.object({
   title: z.string().trim().min(1, "Deal name is required").max(160),
@@ -34,6 +35,14 @@ async function resolveCompanyId(ownerId: string, v: FormDataEntryValue | null) {
   return c?.id ?? null;
 }
 
+async function fireWon(ownerId: string, dealId: string) {
+  try {
+    await runAutomationsForTrigger(ownerId, "deal_won", { dealId });
+  } catch {
+    // ignore automation errors
+  }
+}
+
 export async function createDeal(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await requireUser();
   const parsed = schema.safeParse({ title: formData.get("title") });
@@ -44,7 +53,7 @@ export async function createDeal(_prev: FormState, formData: FormData): Promise<
   const companyId = await resolveCompanyId(user.id, formData.get("companyId"));
   const agg = await prisma.deal.aggregate({ where: { ownerId: user.id, stage }, _max: { order: true } });
 
-  await prisma.deal.create({
+  const created = await prisma.deal.create({
     data: {
       title: parsed.data.title,
       value: toNumber(formData.get("value")),
@@ -59,8 +68,16 @@ export async function createDeal(_prev: FormState, formData: FormData): Promise<
     },
   });
 
+  try {
+    await runAutomationsForTrigger(user.id, "deal_created", { dealId: created.id });
+  } catch {
+    // ignore automation errors
+  }
+  if (stage === "Won") await fireWon(user.id, created.id);
+
   revalidatePath("/deals");
   revalidatePath("/dashboard");
+  revalidatePath("/emails");
   return { ok: true };
 }
 
@@ -101,17 +118,19 @@ export async function updateDeal(_prev: FormState, formData: FormData): Promise<
     },
   });
 
+  if (stage === "Won" && existing.stage !== "Won") await fireWon(user.id, id);
+
   revalidatePath("/deals");
   revalidatePath("/dashboard");
+  revalidatePath("/emails");
   return { ok: true };
 }
 
-/** Persist a drag: set the moved deal's stage and reorder its target column. */
 export async function moveDeal(id: string, toStage: string, orderedIds: string[]) {
   const user = await requireUser();
   const stage = (DEAL_STAGES as readonly string[]).includes(toStage) ? toStage : "Lead";
 
-  const owned = await prisma.deal.findFirst({ where: { id, ownerId: user.id }, select: { id: true } });
+  const owned = await prisma.deal.findFirst({ where: { id, ownerId: user.id }, select: { id: true, stage: true } });
   if (!owned) return;
 
   await prisma.deal.update({ where: { id }, data: { stage, status: statusForStage(stage) } });
@@ -128,8 +147,11 @@ export async function moveDeal(id: string, toStage: string, orderedIds: string[]
       .map((dealId, index) => prisma.deal.update({ where: { id: dealId }, data: { order: index } })),
   );
 
+  if (stage === "Won" && owned.stage !== "Won") await fireWon(user.id, id);
+
   revalidatePath("/deals");
   revalidatePath("/dashboard");
+  revalidatePath("/emails");
 }
 
 export async function deleteDeal(id: string) {

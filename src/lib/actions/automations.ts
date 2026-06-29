@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fieldErrors, optionalText, type FormState } from "@/lib/validation";
 import { TRIGGERS, ACTIONS, getTrigger, getAction } from "@/lib/automation";
+import { executeAutomation } from "@/lib/automation-engine";
 
 const nameSchema = z.object({ name: z.string().trim().min(1, "Name is required").max(120) });
 
@@ -123,6 +124,8 @@ export async function addStep(_prev: FormState, formData: FormData): Promise<For
         type,
         title: optionalText(formData.get("title")) ?? getAction(type).label,
         subtitle: optionalText(formData.get("subtitle")) ?? getAction(type).defaultSubtitle,
+        emailSubject: optionalText(formData.get("emailSubject")),
+        emailBody: optionalText(formData.get("emailBody")),
       },
     });
   }
@@ -162,6 +165,8 @@ export async function updateStep(_prev: FormState, formData: FormData): Promise<
         type,
         title: optionalText(formData.get("title")) ?? getAction(type).label,
         subtitle: optionalText(formData.get("subtitle")) ?? getAction(type).defaultSubtitle,
+        emailSubject: optionalText(formData.get("emailSubject")),
+        emailBody: optionalText(formData.get("emailBody")),
       },
     });
   }
@@ -204,12 +209,13 @@ export async function moveStep(stepId: string, direction: "up" | "down") {
   revalidatePath(`/automation/${step.automationId}`);
 }
 
-export async function simulateRun(automationId: string) {
+export async function runNow(automationId: string, recipientEmail: string) {
   const user = await requireUser();
   if (!(await ownAutomation(user.id, automationId))) return;
-  await prisma.automation.update({ where: { id: automationId }, data: { lastRunAt: new Date() } });
-  await prisma.automationStep.updateMany({ where: { automationId }, data: { status: "Completed" } });
+  const to = recipientEmail?.trim() || user.email;
+  await executeAutomation(automationId, user.id, { recipientOverride: to, recipientName: user.name });
   revalidatePath(`/automation/${automationId}`);
+  revalidatePath("/emails");
 }
 
 export async function resetRun(automationId: string) {

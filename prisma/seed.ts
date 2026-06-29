@@ -154,7 +154,7 @@ async function main() {
     },
   });
   const automationSteps = [
-    { kind: "Action", type: "send_email", title: "Send email", subtitle: 'Send "Follow-up offer email"' },
+    { kind: "Action", type: "send_email", title: "Send email", subtitle: 'Send "Follow-up offer email"', emailSubject: "A follow-up offer just for you", emailBody: "Thanks for opening our email! Here's an exclusive offer to get started with TotalReach. Reply anytime — we're happy to help." },
     { kind: "Condition", type: "condition", title: "Condition", subtitle: "Wait before checking condition", condField: "Email opened", condOperator: "is", condValue: "true" },
     { kind: "Action", type: "add_to_list", title: "Add to list", subtitle: 'Add contact to "Engaged"' },
   ];

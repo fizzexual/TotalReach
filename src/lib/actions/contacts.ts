@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fieldErrors, optionalText, emailRegex, type FormState } from "@/lib/validation";
 import { CONTACT_STATUSES } from "@/lib/constants";
+import { runAutomationsForTrigger } from "@/lib/automation-engine";
 
 const nameSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(80),
@@ -47,10 +48,17 @@ export async function createContact(_prev: FormState, formData: FormData): Promi
   if (input.email && !emailRegex.test(input.email)) return { fieldErrors: { email: "Enter a valid email" } };
 
   const companyId = await resolveCompanyId(user.id, formData.get("companyId"));
-  await prisma.contact.create({ data: { ...parsed.data, ...input, companyId, ownerId: user.id } });
+  const created = await prisma.contact.create({ data: { ...parsed.data, ...input, companyId, ownerId: user.id } });
+
+  try {
+    await runAutomationsForTrigger(user.id, "contact_created", { contactId: created.id });
+  } catch {
+    // automation failures must not break contact creation
+  }
 
   revalidatePath("/contacts");
   revalidatePath("/dashboard");
+  revalidatePath("/emails");
   return { ok: true };
 }
 
