@@ -26,13 +26,10 @@ export async function proxy(req: NextRequest) {
   const token = req.cookies.get(COOKIE_NAME)?.value;
   const valid = await isValidToken(token);
 
+  // Auth pages are always accessible. (Never redirect away from them — a
+  // signature-valid token whose user no longer exists would otherwise cause
+  // an infinite /login <-> /companies redirect loop.)
   if (AUTH_PAGES.includes(pathname)) {
-    if (valid) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/companies";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
     return NextResponse.next();
   }
 

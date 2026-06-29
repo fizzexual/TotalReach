@@ -13,13 +13,19 @@ function statusForStage(stage: string) {
 async function main() {
   const passwordHash = await bcrypt.hash("password123", 10);
 
-  // Idempotent: removing the demo user cascades to all their data.
+  // Idempotent AND stable: keep the demo user's id across reseeds so existing
+  // session cookies remain valid (otherwise old cookies orphan and loop).
   const existing = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
-  if (existing) await prisma.user.delete({ where: { email: DEMO_EMAIL } });
-
-  const user = await prisma.user.create({
-    data: { name: "Demo User", email: DEMO_EMAIL, passwordHash },
-  });
+  let user;
+  if (existing) {
+    await prisma.activity.deleteMany({ where: { ownerId: existing.id } });
+    await prisma.deal.deleteMany({ where: { ownerId: existing.id } });
+    await prisma.contact.deleteMany({ where: { ownerId: existing.id } });
+    await prisma.company.deleteMany({ where: { ownerId: existing.id } });
+    user = await prisma.user.update({ where: { id: existing.id }, data: { name: "Demo User", passwordHash } });
+  } else {
+    user = await prisma.user.create({ data: { name: "Demo User", email: DEMO_EMAIL, passwordHash } });
+  }
   const ownerId = user.id;
 
   // Companies — order matches the "Top companies" view.
