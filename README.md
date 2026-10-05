@@ -1,10 +1,14 @@
-# TotalReach CRM
+# TotalReach CRM 🍂
 
 A full-stack CRM web application — the working product behind a "Luman"-style marketing site.
 Manage contacts, companies, a drag-and-drop deal pipeline, and tasks/activities in one clean,
 focused workspace.
 
 > A dark, Attio-style data-table interface built with Next.js (App Router) + TypeScript + Tailwind CSS + Prisma/SQLite.
+
+## About
+
+TotalReach is a self-run CRM for keeping track of contacts, companies, deals and follow-up tasks. It is aimed at small sales teams and freelancers who want a simple pipeline tool without a per-seat SaaS. The app works end to end on a local SQLite database with seeded demo data; a hosted database is needed for a production deployment.
 
 ## Features
 
