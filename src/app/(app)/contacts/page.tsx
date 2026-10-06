@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Users, Search } from "lucide-react";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Avatar, Badge, Input, PageHeader } from "@/components/ui";

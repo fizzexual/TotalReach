@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config"; // Prisma 7 no longer loads .env on its own
 import bcrypt from "bcryptjs";
 import { addDays } from "date-fns";
-
-const prisma = new PrismaClient();
+import { prisma } from "../src/lib/db";
 
 const DEMO_EMAIL = "demo@totalreach.app";
 

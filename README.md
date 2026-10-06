@@ -28,7 +28,7 @@ TotalReach is a self-run CRM for keeping track of contacts, companies, deals and
 | Framework | Next.js 16 (App Router, Server Components, Server Actions) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
-| Database | SQLite via Prisma ORM |
+| Database | SQLite via Prisma ORM 7 (`better-sqlite3` driver adapter) |
 | Auth | Custom — `bcryptjs` + `jose` (JWT) + httpOnly cookie |
 | Drag & drop | `@dnd-kit` |
 | Charts | `recharts` |
@@ -37,10 +37,10 @@ TotalReach is a self-run CRM for keeping track of contacts, companies, deals and
 
 ## Getting started
 
-Prerequisites: **Node.js 18+** and npm.
+Prerequisites: **Node.js 20.19+** (or 22.12+ / 24+, required by Prisma 7) and npm.
 
 ```bash
-# 1. Install dependencies
+# 1. Install dependencies (also generates the Prisma client)
 npm install
 
 # 2. Create your environment file
@@ -74,7 +74,7 @@ Or create a brand-new account from the sign-up page.
 | `npm run dev` | Start the development server |
 | `npm run build` | Production build |
 | `npm run start` | Run the production build |
-| `npm run db:push` | Apply the Prisma schema to the database |
+| `npm run db:push` | Apply the Prisma schema to the database and regenerate the Prisma client |
 | `npm run db:seed` | Seed demo data (idempotent — resets the demo user) |
 | `npm run db:reset` | Wipe the DB, re-apply schema, and re-seed |
 | `npm run test` | Run unit tests (Vitest) |
@@ -97,15 +97,17 @@ src/
     activity-list.tsx
   lib/
     auth.ts            # password hashing, sessions, current user
-    db.ts              # Prisma client singleton
+    db.ts              # Prisma client singleton (better-sqlite3 driver adapter)
     actions/           # server actions (auth, contacts, companies, deals, activities, profile)
     constants.ts       # deal stages, activity types, status metadata
     format.ts          # currency / date formatting helpers
     validation.ts      # form parsing & Zod helpers
+  generated/prisma/    # generated Prisma client (git-ignored; `npm install` / `npm run db:generate`)
   proxy.ts             # route protection (Next.js proxy / middleware)
 prisma/
   schema.prisma        # data model
   seed.ts              # demo data
+prisma.config.ts       # Prisma CLI config: schema path, seed command, DATABASE_URL (loaded from .env)
 ```
 
 ## Data model
@@ -120,7 +122,7 @@ signed-in user.
 - Set a strong, unique `AUTH_SECRET` in production.
 - `.env` and the SQLite database (`*.db`) are git-ignored and never committed.
 - For a production deployment, switch the datasource to a hosted database (e.g. Postgres) by
-  updating `prisma/schema.prisma` and `DATABASE_URL`.
+  updating `prisma/schema.prisma`, `DATABASE_URL`, and the driver adapter in `src/lib/db.ts`.
 
 ## License
 
