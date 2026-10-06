@@ -124,4 +124,4 @@ signed-in user.
 
 ## License
 
-Private project.
+MIT — see [LICENSE](LICENSE).
